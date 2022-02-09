@@ -9,7 +9,7 @@ __version__ = "2020-04-15"
 
 from atds import Stack, BinaryTree
 
-def build_parse_tree(fpexpr):
+def build_parse_tree(fpexpr):#Parser
     """Creates a binary tree from the fully-parenthesized
     expression. We'll do this by pushing the current tree
     (current_focus) onto a stack when we descend to its 
@@ -18,26 +18,7 @@ def build_parse_tree(fpexpr):
     filling out the subtree.
     """
     
-    tokens = []
-    lastType = 'nothing'
-
-    for c in fpexpr:
-        if c in '.0123456789':
-            new_type = 'number'
-            if new_type==last_type:
-                tokens[-1] += c
-            else:
-                tokens.append(c)
-                last_type = new_type
-        elif c in '+-*/':
-            tokens.append(c)
-            last_type = 'operation'
-        elif c in '()':
-            tokens.append(c)
-            last_type = 'parenthesis'
-        
-        else:
-            continue
+    tokens = tokenize(fpexpr)
 
     pt = BinaryTree()
     stack = Stack() #I think I'll have to do something with this stack in order to get it to work without all being in parentheses
@@ -67,10 +48,36 @@ def build_parse_tree(fpexpr):
 
 
     return pt
+
+
+def tokenize(fpexpr): #Lexer
+    """This function takes a string of a mathematical expression, and returns
+    a list of tokens (still strings). The tokens are either numbers (.0123456789), operations (+,-,*,/), or parentheses."""
+
+    lastType = 'nothing'
+    tokens = []
+    for c in fpexpr:
+        if c in '.0123456789':
+            new_type = 'number'
+            if new_type==last_type:
+                tokens[-1] += c
+            else:
+                tokens.append(c)
+                last_type = new_type
+        elif c in '+-*/':
+            tokens.append(c)
+            last_type = 'operation'
+        elif c in '()':
+            tokens.append(c)
+            last_type = 'parenthesis'
+        
+        else:#c is not a number, operation, or parenthesis (probably a space)
+            continue
+    return tokens
     
 
 
-def evaluate(parse_tree):
+def evaluate(parse_tree):#Interpreter
     """Now that the binary parse tree has been assembled, we can
     traverse through it recursively, using the values of each 
     node to calculate the final result of the mathematical expression.
