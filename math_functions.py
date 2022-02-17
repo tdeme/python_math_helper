@@ -1,6 +1,8 @@
 import math
 import statistics
 import parse_tree
+from lexer import Lexer
+from parser_ import Parser
 
 #function to find primes within a certain range
 def findPrimes(start, finish):
@@ -89,9 +91,13 @@ def evaluate(expression):
 
 
 def main():
-    expression = input("enter the expression to be evaluated: ")
+    text = input("calc > ")
+    lexer = Lexer(text)
+    tokens = lexer.generate_tokens()
+    parser = Parser(tokens)
+    tree = parser.parse()
 
-    print(evaluate(expression))
+    print(evaluate(str(tree)))
 
 
 if __name__=='__main__':
