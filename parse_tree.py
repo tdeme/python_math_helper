@@ -54,7 +54,7 @@ def tokenize(fpexpr): #Lexer
     """This function takes a string of a mathematical expression, and returns
     a list of tokens (still strings). The tokens are either numbers (.0123456789), operations (+,-,*,/), or parentheses."""
 
-    lastType = 'nothing'
+    last_type = 'nothing'
     tokens = []
     for c in fpexpr:
         if c in '.0123456789':
