@@ -52,3 +52,11 @@ class MinusNode:
 
     def __repr__(self):
         return f"-{self.node}"
+
+@dataclass
+class ExpNode:
+    node_a: any
+    node_b: any
+
+    def __repr__(self):
+        return f"({self.node_a} ** {self.node_b})"
