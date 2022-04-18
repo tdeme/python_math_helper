@@ -51,6 +51,21 @@ class Calculator:
         self.create_digit_buttons()
         self.create_operator_buttons()
         self.create_special_buttons()
+        self.bind_keys()
+
+    
+    def bind_keys(self):
+        self.window.bind("<Return>", lambda event: self.evaluate())
+        self.window.bind("<BackSpace>", lambda event: self.clear())
+        self.window.bind("<Delete>", lambda event: self.clear())
+        self.window.bind("<Escape>", lambda event: self.clear())
+
+        for key in '1234567890.()':
+            self.window.bind(str(key), lambda event,x=key:self.add_to_expression(x))
+
+        for key in self.operations:
+            self.window.bind(key, lambda event,x=key:self.append_operator(x))
+
 
     def create_special_buttons(self):
         self.create_clear_button()
@@ -61,12 +76,12 @@ class Calculator:
 
     def create_display_labels(self):
         total_label = tk.Label(self.display_frame, text=self.total_expression, anchor=tk.E,
-        bg=LIGHT_GREY, fg=LABEL_COLOR, padx=24, font=SMALL_FONT_STYLE)
+        highlightbackground=LIGHT_GREY, fg=LABEL_COLOR, padx=24, font=SMALL_FONT_STYLE)
 
         total_label.pack(expand=True, fill="both")
 
         label = tk.Label(self.display_frame, text=self.current_expression, anchor=tk.E,
-        bg=LIGHT_GREY, fg=LABEL_COLOR, padx=24, font=LARGE_FONT_STYLE)
+        highlightbackground=LIGHT_GREY, fg=LABEL_COLOR, padx=24, font=LARGE_FONT_STYLE)
 
         label.pack(expand=True, fill="both")
 
@@ -74,7 +89,7 @@ class Calculator:
 
 
     def create_display_frame(self):
-        frame = tk.Frame(self.window, height = 221, bg = LIGHT_GREY)
+        frame = tk.Frame(self.window, height = 221, highlightbackground = LIGHT_GREY)
         frame.pack(expand=True, fill="both")
         return frame
 
@@ -94,7 +109,7 @@ class Calculator:
 
     def create_digit_buttons(self):
         for digit, grid_value in self.digits.items():
-            button = tk.Button(self.buttons_frame, text=str(digit), bg=WHITE, fg=LABEL_COLOR, font=DIGITS_FONT_STYLE,
+            button = tk.Button(self.buttons_frame, text=str(digit), highlightbackground=WHITE, fg=LABEL_COLOR, font=DIGITS_FONT_STYLE,
             borderwidth=0, command=lambda x=digit:self.add_to_expression(x))
             button.grid(row=grid_value[0], column=grid_value[1], sticky=tk.NSEW)
 
@@ -102,7 +117,7 @@ class Calculator:
     def create_operator_buttons(self):
         i = 0
         for operator, symbol in self.operations.items():
-            button = tk.Button(self.buttons_frame, text=symbol, bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+            button = tk.Button(self.buttons_frame, text=symbol, highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
             command=lambda x=operator:self.append_operator(x))
 
             button.grid(row=i,column=4, sticky=tk.NSEW)
@@ -110,14 +125,16 @@ class Calculator:
 
 
     def clear(self):
-        self.total_expression = ""
-        self.current_expression = ""
-        self.update_label()
-        self.update_total_label()
+        if self.current_expression!="":
+            self.current_expression = ""
+            self.update_label()
+        else:
+            self.total_expression = ""
+            self.update_total_label()
 
 
     def create_clear_button(self):
-        button = tk.Button(self.buttons_frame, text="C", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        button = tk.Button(self.buttons_frame, text="C", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.clear)
 
         button.grid(row=0,column=1, sticky=tk.NSEW)
@@ -139,7 +156,7 @@ class Calculator:
             print(e)
 
     def create_square_button(self):
-        button = tk.Button(self.buttons_frame, text="x\u00b2", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        button = tk.Button(self.buttons_frame, text="x\u00b2", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.square)
 
         button.grid(row=0,column=2, sticky=tk.NSEW)
@@ -163,7 +180,7 @@ class Calculator:
             self.update_label()
 
     def create_sqrt_button(self):
-        button = tk.Button(self.buttons_frame, text="\u221a"+"x", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        button = tk.Button(self.buttons_frame, text="\u221a"+"x", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.sqrt)
 
         button.grid(row=0,column=3, sticky=tk.NSEW)
@@ -191,7 +208,7 @@ class Calculator:
             self.update_label()
 
     def create_equals_button(self):
-        button = tk.Button(self.buttons_frame, text="=", bg=LIGHT_BLUE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        button = tk.Button(self.buttons_frame, text="=", highlightbackground=LIGHT_BLUE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.evaluate)
 
         button.grid(row=4,column=3, columnspan=2, sticky=tk.NSEW)
