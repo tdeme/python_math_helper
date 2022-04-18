@@ -1,4 +1,7 @@
 import tkinter as tk
+from lexer import Lexer
+from parser_ import Parser
+from interpreter import Interpreter
 
 
 #Defining the font and color values
@@ -52,6 +55,8 @@ class Calculator:
     def create_special_buttons(self):
         self.create_clear_button()
         self.create_equals_button()
+        self.create_square_button()
+        self.create_sqrt_button()
 
 
     def create_display_labels(self):
@@ -79,6 +84,14 @@ class Calculator:
         self.update_label()
 
 
+    def append_operator(self, operator):
+        self.current_expression += operator
+        self.total_expression+=self.current_expression
+        self.current_expression=""
+        self.update_total_label()
+        self.update_label()
+
+
     def create_digit_buttons(self):
         for digit, grid_value in self.digits.items():
             button = tk.Button(self.buttons_frame, text=str(digit), bg=WHITE, fg=LABEL_COLOR, font=DIGITS_FONT_STYLE,
@@ -89,20 +102,97 @@ class Calculator:
     def create_operator_buttons(self):
         i = 0
         for operator, symbol in self.operations.items():
-            button = tk.Button(self.buttons_frame, text=symbol, bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0)
+            button = tk.Button(self.buttons_frame, text=symbol, bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+            command=lambda x=operator:self.append_operator(x))
 
             button.grid(row=i,column=4, sticky=tk.NSEW)
             i+=1
 
 
-    def create_clear_button(self):
-        button = tk.Button(self.buttons_frame, text="C", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0)
+    def clear(self):
+        self.total_expression = ""
+        self.current_expression = ""
+        self.update_label()
+        self.update_total_label()
 
-        button.grid(row=0,column=1, columnspan=3, sticky=tk.NSEW)
+
+    def create_clear_button(self):
+        button = tk.Button(self.buttons_frame, text="C", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        command=self.clear)
+
+        button.grid(row=0,column=1, sticky=tk.NSEW)
 
     
+    def square(self):
+        try:
+            text = self.current_expression
+            lexer = Lexer(text)
+            tokens = lexer.generate_tokens()
+            parser = Parser(tokens)
+            tree = parser.parse()
+            interpreter = Interpreter()
+            value = interpreter.visit(tree)
+            self.current_expression = str(value.value**2)
+            self.update_label()
+
+        except Exception as e:
+            print(e)
+
+    def create_square_button(self):
+        button = tk.Button(self.buttons_frame, text="x\u00b2", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        command=self.square)
+
+        button.grid(row=0,column=2, sticky=tk.NSEW)
+
+
+    def sqrt(self):
+        try:
+            text = self.current_expression
+            lexer = Lexer(text)
+            tokens = lexer.generate_tokens()
+            parser = Parser(tokens)
+            tree = parser.parse()
+            interpreter = Interpreter()
+            value = interpreter.visit(tree)
+            self.current_expression = str(value.value**0.5)
+            self.update_label()
+
+        except Exception as e:
+            self.current_expression = "Error"
+        finally:
+            self.update_label()
+
+    def create_sqrt_button(self):
+        button = tk.Button(self.buttons_frame, text="\u221a"+"x", bg=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        command=self.sqrt)
+
+        button.grid(row=0,column=3, sticky=tk.NSEW)
+
+    def evaluate(self):
+        self.total_expression+=self.current_expression
+        self.update_total_label()
+
+        try:
+            text = self.total_expression
+            self.total_expression = ""
+            self.update_total_label()
+            lexer = Lexer(text)
+            tokens = lexer.generate_tokens()
+            parser = Parser(tokens)
+            tree = parser.parse()
+            interpreter = Interpreter()
+            value = interpreter.visit(tree)
+            self.current_expression = str(value)
+            self.update_label()
+
+        except Exception as e:
+            self.current_expression = "Error"
+        finally:
+            self.update_label()
+
     def create_equals_button(self):
-        button = tk.Button(self.buttons_frame, text="=", bg=LIGHT_BLUE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0)
+        button = tk.Button(self.buttons_frame, text="=", bg=LIGHT_BLUE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        command=self.evaluate)
 
         button.grid(row=4,column=3, columnspan=2, sticky=tk.NSEW)
 
@@ -114,11 +204,15 @@ class Calculator:
 
 
     def update_total_label(self):
-        self.total_label.config(text=self.total_expression)
+        expression = self.total_expression
+        for operator, symbol in self.operations.items():
+            expression = expression.replace(operator, f' {symbol} ')
+
+        self.total_label.config(text=expression)
 
 
     def update_label(self):
-        self.label.config(text=self.current_expression)
+        self.label.config(text=self.current_expression[:11])
 
 
     def run(self):
