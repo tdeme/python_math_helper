@@ -21,7 +21,7 @@ class Calculator:
         #Setup window
         self.window = tk.Tk()
         self.window.geometry("400x667")
-        self.window.resizable(0,0)
+        self.window.resizable(1,1)
         self.window.title("Calculator")
 
         #Initialize variables to hold the current expression and total expression
@@ -33,10 +33,11 @@ class Calculator:
         
         #Create a dictionary to hold the digits and their grid values
         self.digits = {
-            7:(1,1), 8:(1,2), 9:(1,3),
-            4:(2,1), 5:(2,2), 6:(2,3),
-            1:(3,1), 2:(3,2), 3:(3,3),
-            0:(4,1), ".":(4,2)
+            "(":(1,1), ")":(1,2),
+            7:(2,1), 8:(2,2), 9:(2,3),
+            4:(3,1), 5:(3,2), 6:(3,3),
+            1:(4,1), 2:(4,2), 3:(4,3),
+            0:(5,1), ".":(5,2)
         }
         self.operations = {"/": "\u00F7", "*": "\u00D7", "+": "+", "-": "-"}
         self.buttons_frame = self.create_buttons_frame()            
@@ -72,6 +73,7 @@ class Calculator:
         self.create_equals_button()
         self.create_square_button()
         self.create_sqrt_button()
+        self.create_invert_button()
 
 
     def create_display_labels(self):
@@ -115,7 +117,7 @@ class Calculator:
 
 
     def create_operator_buttons(self):
-        i = 0
+        i = 1
         for operator, symbol in self.operations.items():
             button = tk.Button(self.buttons_frame, text=symbol, highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
             command=lambda x=operator:self.append_operator(x))
@@ -137,7 +139,7 @@ class Calculator:
         button = tk.Button(self.buttons_frame, text="C", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.clear)
 
-        button.grid(row=0,column=1, sticky=tk.NSEW)
+        button.grid(row=0,column=1, columnspan=2, sticky=tk.NSEW)
 
     
     def square(self):
@@ -159,7 +161,7 @@ class Calculator:
         button = tk.Button(self.buttons_frame, text="x\u00b2", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.square)
 
-        button.grid(row=0,column=2, sticky=tk.NSEW)
+        button.grid(row=0,column=3, sticky=tk.NSEW)
 
 
     def sqrt(self):
@@ -183,7 +185,38 @@ class Calculator:
         button = tk.Button(self.buttons_frame, text="\u221a"+"x", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.sqrt)
 
-        button.grid(row=0,column=3, sticky=tk.NSEW)
+        button.grid(row=0,column=4, sticky=tk.NSEW)
+
+
+    def invert(self):
+        if self.total_expression=="" and self.current_expression=="":
+            self.current_expression+="-"
+            self.update_label()
+
+        elif self.current_expression=="":
+            self.total_expression="-("+self.total_expression+")"
+            self.update_total_label()
+
+        elif self.total_expression=="":
+            self.total_expression="-("+self.current_expression+")"
+            self.current_expression=""
+            self.update_label()
+            self.update_total_label()
+
+        else:
+            self.total_expression+="-("+self.current_expression+")"
+            self.current_expression=""
+            self.update_label()
+            self.update_total_label()
+            
+
+    
+    def create_invert_button(self):
+        button = tk.Button(self.buttons_frame, text="+/-", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
+        command=self.invert)
+
+        button.grid(row=1,column=3, sticky=tk.NSEW)
+
 
     def evaluate(self):
         self.total_expression+=self.current_expression
@@ -211,7 +244,7 @@ class Calculator:
         button = tk.Button(self.buttons_frame, text="=", highlightbackground=LIGHT_BLUE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.evaluate)
 
-        button.grid(row=4,column=3, columnspan=2, sticky=tk.NSEW)
+        button.grid(row=5,column=3, columnspan=2, sticky=tk.NSEW)
 
 
     def create_buttons_frame(self):
