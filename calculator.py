@@ -55,7 +55,7 @@ class Calculator:
         self.bind_keys()
 
     
-    def bind_keys(self):
+    def bind_keys(self): #This method binds the (relevant) keys to the calculator buttons
         self.window.bind("<Return>", lambda event: self.evaluate())
         self.window.bind("<BackSpace>", lambda event: self.clear())
         self.window.bind("<Delete>", lambda event: self.clear())
@@ -68,7 +68,7 @@ class Calculator:
             self.window.bind(key, lambda event,x=key:self.append_operator(x))
 
 
-    def create_special_buttons(self):
+    def create_special_buttons(self): #Self explanatory
         self.create_clear_button()
         self.create_equals_button()
         self.create_square_button()
@@ -76,7 +76,7 @@ class Calculator:
         self.create_invert_button()
 
 
-    def create_display_labels(self):
+    def create_display_labels(self): #Creates the labels for the current expression and total expression
         total_label = tk.Label(self.display_frame, text=self.total_expression, anchor=tk.E,
         highlightbackground=LIGHT_GREY, fg=LABEL_COLOR, padx=24, font=SMALL_FONT_STYLE)
 
@@ -90,18 +90,18 @@ class Calculator:
         return total_label, label
 
 
-    def create_display_frame(self):
+    def create_display_frame(self): #Creates the frame for the display
         frame = tk.Frame(self.window, height = 221, highlightbackground = LIGHT_GREY)
         frame.pack(expand=True, fill="both")
         return frame
 
 
-    def add_to_expression(self, value):
+    def add_to_expression(self, value): #Adds the value to the current expression
         self.current_expression += str(value)
         self.update_label()
 
 
-    def append_operator(self, operator):
+    def append_operator(self, operator): #Appends the operator to the current expression, and updates the label
         self.current_expression += operator
         self.total_expression+=self.current_expression
         self.current_expression=""
@@ -116,7 +116,7 @@ class Calculator:
             button.grid(row=grid_value[0], column=grid_value[1], sticky=tk.NSEW)
 
 
-    def create_operator_buttons(self):
+    def create_operator_buttons(self): #Creates the operator buttons
         i = 1
         for operator, symbol in self.operations.items():
             button = tk.Button(self.buttons_frame, text=symbol, highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
@@ -126,7 +126,7 @@ class Calculator:
             i+=1
 
 
-    def clear(self):
+    def clear(self): #Clears the current expression and total expression. First current, then total
         if self.current_expression!="":
             self.current_expression = ""
             self.update_label()
@@ -135,14 +135,14 @@ class Calculator:
             self.update_total_label()
 
 
-    def create_clear_button(self):
+    def create_clear_button(self): #Self explanatory at this point
         button = tk.Button(self.buttons_frame, text="C", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
         command=self.clear)
 
         button.grid(row=0,column=1, columnspan=2, sticky=tk.NSEW)
 
     
-    def square(self):
+    def square(self): #Squares the current expression
         try:
             text = self.current_expression
             lexer = Lexer(text)
@@ -164,7 +164,7 @@ class Calculator:
         button.grid(row=0,column=3, sticky=tk.NSEW)
 
 
-    def sqrt(self):
+    def sqrt(self): #Takes the square root of the current expression
         try:
             text = self.current_expression
             lexer = Lexer(text)
@@ -188,18 +188,26 @@ class Calculator:
         button.grid(row=0,column=4, sticky=tk.NSEW)
 
 
-    def invert(self):
+    def invert(self): #Inverts (negates) the current expression
         if self.total_expression=="" and self.current_expression=="":
             self.current_expression+="-"
             self.update_label()
 
         elif self.current_expression=="":
-            self.total_expression="-("+self.total_expression+")"
+            if self.total_expression[0]=="-":
+                self.total_expression = self.total_expression[1:]
+            
+            else:
+                self.total_expression="-("+self.total_expression+")"
             self.update_total_label()
 
         elif self.total_expression=="":
-            self.total_expression="-("+self.current_expression+")"
-            self.current_expression=""
+            if self.current_expression[0]=="-":
+                self.current_expression = self.current_expression[1:]
+                
+            else:
+                self.total_expression="-("+self.current_expression+")"
+                self.current_expression=""
             self.update_label()
             self.update_total_label()
 
@@ -218,7 +226,7 @@ class Calculator:
         button.grid(row=1,column=3, sticky=tk.NSEW)
 
 
-    def evaluate(self):
+    def evaluate(self): #Calls the parser and interpreter to evaluate the current expression
         self.total_expression+=self.current_expression
         self.update_total_label()
 
