@@ -169,21 +169,24 @@ class Calculator:
 
 
     def sqrt(self): #Takes the square root of the current expression
-        try:
-            text = self.current_expression
-            lexer = Lexer(text)
-            tokens = lexer.generate_tokens()
-            parser = Parser(tokens)
-            tree = parser.parse()
-            interpreter = Interpreter()
-            value = interpreter.visit(tree)
-            self.current_expression = str(value.value**0.5)
-            self.update_label()
-
-        except Exception as e:
+        if self.current_expression and self.current_expression[0]=="-":
             self.current_expression = "Error"
-        finally:
-            self.update_label()
+        else:
+            try:
+                text = self.current_expression
+                lexer = Lexer(text)
+                tokens = lexer.generate_tokens()
+                parser = Parser(tokens)
+                tree = parser.parse()
+                interpreter = Interpreter()
+                value = interpreter.visit(tree)
+                self.current_expression = str(value.value**0.5)
+                self.update_label()
+
+            except Exception as e:
+                self.current_expression = "Error"
+        
+        self.update_label()
 
     def create_sqrt_button(self):
         button = tk.Button(self.buttons_frame, text="\u221a"+"x", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
