@@ -43,11 +43,15 @@ class Calculator:
         self.buttons_frame = self.create_buttons_frame()            
 
         #Create the buttons
+
+        #We need a couple extra rows...
         self.buttons_frame.rowconfigure(0,weight=1)
+        self.buttons_frame.rowconfigure(5,weight=1)
 
         for x in range(1,5):
             self.buttons_frame.rowconfigure(x,weight=1)
             self.buttons_frame.columnconfigure(x,weight=1)
+        
             
         self.create_digit_buttons()
         self.create_operator_buttons()
@@ -73,7 +77,7 @@ class Calculator:
         self.create_equals_button()
         self.create_square_button()
         self.create_sqrt_button()
-        self.create_invert_button()
+        self.create_negate_button()
 
 
     def create_display_labels(self): #Creates the labels for the current expression and total expression
@@ -188,40 +192,19 @@ class Calculator:
         button.grid(row=0,column=4, sticky=tk.NSEW)
 
 
-    def invert(self): #Inverts (negates) the current expression
-        if self.total_expression=="" and self.current_expression=="":
-            self.current_expression+="-"
-            self.update_label()
-
-        elif self.current_expression=="":
-            if self.total_expression[0]=="-":
-                self.total_expression = self.total_expression[1:]
-            
-            else:
-                self.total_expression="-("+self.total_expression+")"
-            self.update_total_label()
-
-        elif self.total_expression=="":
-            if self.current_expression[0]=="-":
-                self.current_expression = self.current_expression[1:]
+    def negate(self): #Negates the current expression
+        if len(self.current_expression)>0 and self.current_expression[0]=="-":
+            self.current_expression = self.current_expression[1:]
                 
-            else:
-                self.total_expression="-("+self.current_expression+")"
-                self.current_expression=""
-            self.update_label()
-            self.update_total_label()
-
         else:
-            self.total_expression+="-("+self.current_expression+")"
-            self.current_expression=""
-            self.update_label()
-            self.update_total_label()
-            
+            self.current_expression = "-" + self.current_expression
 
+        self.update_label()
+            
     
-    def create_invert_button(self):
+    def create_negate_button(self):
         button = tk.Button(self.buttons_frame, text="+/-", highlightbackground=OFF_WHITE, fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0,
-        command=self.invert)
+        command=self.negate)
 
         button.grid(row=1,column=3, sticky=tk.NSEW)
 
